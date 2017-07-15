@@ -1,0 +1,11 @@
+#!/bin/bash
+# wgr - Which Git Repository
+#
+# Prints the name of the organization and repository under which the current
+# directory is controlled, if any. If the current directory is uncontrolled, it
+# prints an empty string. The gymnastics with the nested `git config` calls
+# ensure that the correct "remote" target is always reflected, in case you have
+# a local view in which multiple remotes are defined.
+#
+# This function is also included in the sample `bash_functions`.
+git config --get remote.$(git config --get branch.$(wgb).remote).url 2> /dev/null | cut -d '/' -f 4-5

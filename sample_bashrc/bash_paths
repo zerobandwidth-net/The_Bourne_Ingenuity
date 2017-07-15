@@ -1,0 +1,44 @@
+#!/bin/bash
+# Referenced by the sample .bashrc, this file would define your custom
+# operational path, as well as any environment variables that name specific
+# paths for specific applications, such as Java, Eclipse, Android Studio,
+# Gradle, etc.
+
+# PATHS FOR SPECIFIC PROCESSES
+#
+# Programs and tools often require paths to be defined as specific environment
+# variables. Here are some of the most common. The actual paths may vary
+# depending on how you choose to install the corresponding packages; I tend to
+# try to install everything under /opt/ if possible.
+export ANDROID_HOME=/opt/android-sdk
+export ECLIPSE_HOME=/opt/eclipse
+export GRADLE_USER_HOME=${HOME}/.gradle
+export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
+
+# CUSTOM COMMAND PATH SPEC
+#
+# By defining your path this way, you can safely re-execute .bashrc or this
+# script without redundantly adding the same paths over and over again. Instead
+# of exiting your shell and starting a new one, you can just execute .bashrc
+# again, and you won't build up a giant path with a bunch of repeats in it.
+#
+# This happens second so that we can use the specific-case paths to the command
+# path spec as well. By defining paths in this sequence, if any of the paths to
+# your tools or applications is changed, you can change it above, and that
+# change will be picked up down here without having to do any more work to keep
+# the lists in sync.
+for d in ${HOME}/bin ${HOME}/scripts \
+         ${ANDROID_HOME}/build-tools \
+         ${ANDROID_HOME}/platform-tools \
+         ${ANDROID_HOME}/tools \
+         ${ECLIPSE_HOME} \
+         ${JAVA_HOME}/bin \
+         /opt/bin \
+         /opt/android-studio/bin \
+         /opt/node/bin
+do # add the path only if it exists and isn't already in the current pathspec
+  if [[ -d $d && ! $PATH =~ .*$d*.* ]] ; then
+    export PATH=${PATH}:$d
+  fi
+done
+

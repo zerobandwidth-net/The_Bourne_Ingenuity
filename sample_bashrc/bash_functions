@@ -1,0 +1,51 @@
+#!/bin/bash
+# Referenced by the sample .bashrc, this file declares functions that would be
+# available in every shell session. Most of these are also included in this
+# repository as discrete scripts which could be placed somewhere like /opt/bin/
+# or ${HOME}/bin instead.
+
+# wgb - Which Git Branch
+#
+# Prints the name of the branch under which the current directory is controlled,
+# if any. If the current directory is uncontrolled, it prints an empty string.
+# This works for both local-only and remote-linked branches.
+#
+# This function is also included as a discrete script in this repository.
+function wgb
+{
+  git symbolic-ref HEAD 2> /dev/null | cut -d '/' -f 3
+}
+
+# wgr - Which Git Repository
+#
+# Prints the name of the organization and repository under which the current
+# directory is controlled, if any. If the current directory is uncontrolled, it
+# prints an empty string. The gymnastics with the nested `git config` calls
+# ensure that the correct "remote" target is always reflected, in case you have
+# a local view in which multiple remotes are defined.
+#
+# This function is also included as a discrete script in this repository.
+function wgr
+{
+  git config --get remote.$(git config --get branch.$(wgb).remote).url \
+    2> /dev/null | cut -d '/' -f 4-5
+}
+
+# gitloc - GIT LOCation
+#
+# Uses the `wgr` and `wgb` functions together, to render an indication of the
+# organization, repository, and branch under which the current directory is
+# controlled, if any. If the current directory is uncontrolled, it prints an
+# empty string. The output format is designed to be included as an extra
+# (conditional) line in the shell prompt; its exact look and feel may be
+# tweaked to taste.
+#
+# This function is also included as a discrete script in this repository.
+function gitloc
+{
+  if [[ -n $(git remote 2> /dev/null) ]] ; then
+    echo -e "\n[ $(wgr)/$(wgb) ]"
+  fi
+}
+
+export wgb wgr gitloc

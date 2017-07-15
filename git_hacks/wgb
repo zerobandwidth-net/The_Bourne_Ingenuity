@@ -1,0 +1,9 @@
+#!/bin/bash
+# wgb - Which Git Branch
+#
+# Prints the name of the branch under which the current directory is controlled,
+# if any. If the current directory is uncontrolled, it prints an empty string.
+# This works for both local-only and remote-linked branches.
+#
+# This function is also included in the sample `bash_functions`.
+git symbolic-ref HEAD 2> /dev/null | cut -d '/' -f 3

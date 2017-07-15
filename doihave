@@ -1,0 +1,8 @@
+#!/bin/bash
+# doihave - (Debian-based systems) Checks whether any packages fitting the given
+# pattern are installed.
+if [[ -n $1 ]] ; then
+  dpkg --get_selections | grep $1
+else
+  echo "The script needs input!"
+fi

@@ -1,0 +1,28 @@
+#!/bin/bash
+# adb-backup - Backs up an Android device via ADB.
+while [[ -z ${BACKUP_PACKAGE} ]] ; do
+  read -p "Enter the app package: " BACKUP_PACKAGE
+done
+while [[ -z ${ANDROID_ID} ]] ; do
+  adb devices --list
+  read -p "Enter the Android device ID: " ANDROID_ID
+done
+while [[ -z ${DEVICE_LABEL} ]] ; do
+  read -p "Enter a label to be used for the backup: " DEVICE_LABEL
+done
+echo "Package:          [${BACKUP_PACKAGE}]"
+echo "Device ID:        [${ANDROID_ID}]"
+echo "Backup Label:     [${DEVICE_LABEL}]"
+read -s -n 1 -p "Proceed? [Y/n] "
+echo ""
+if [[ $REPLY =~ ^[Nn]$ ]] ; then
+  echo "Script cancelled."
+  exit 4
+fi
+STAMPED_LABEL=${DEVICE_LABEL}-$(date +%Y%m%d-%H%M%S)
+adb -s ${ANDROID_ID} backup -f backup-${STAMPED_LABEL}.ab ${BACKUP_PACKAGE}
+mkdir $STAMPED_LABEL
+mv backup-${STAMPED_LABEL}.ab ./${STAMPED_LABEL}/
+cd ${STAMPED_LABEL}
+dd if=backup-${STAMPED_LABEL}.ab bs=1 skip=24 | zlib-flate -uncompress | tar xf -
+

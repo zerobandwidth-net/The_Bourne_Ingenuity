@@ -1,0 +1,60 @@
+#!/bin/bash
+# This function will ensure that some local directory is linked to a Git
+# repository and contains what you expect it to.
+#
+# $1 -> $COMP_NAME - The name of the thing that is controlled in this repo.
+#        Used for display purposes in prompts, status messages, etc.
+# $2 -> $LOCAL_PATH_VAR - The variable that is holding the local path. This is
+#        used by reference within the function, assuming that you've gathered
+#        the local path as the value of some variable earlier in your script.
+# $3 -> $REMOTE_PATH - The remote path to the Git repository. This should be
+#        the complete URI for a `git clone` command, in case we need to execute
+#        a clone command to initialize the local view.
+# $4 -> $TELLTALE - Some directory within the repository, which isn't `/.git/`,
+#        which is a tell-tale sign that the contents of the repository are
+#        properly loaded. This is often something like `src`, `appSomeModule`,
+#        etc.
+function ensure_repository_contents
+{
+  COMP_NAME=$1
+  LOCAL_PATH_VAR=$2
+  REMOTE_PATH=$3
+  TELLTALE=$4
+  if [[ ! -d ${!LOCAL_PATH_VAR}/.git ]] ; then
+    read -s -n 1 -p "The local ${COMP_NAME} view is empty. Clone it? [Y/n] "
+    echo ""                            # Ensures a line end after unechoed input
+    if [[ $REPLY =~ ^[Nn]$ ]] ; then
+      echo "CANCELLED. Aborting; source files are required."
+      return 2
+    fi
+    git clone ${REMOTE_PATH} ${!LOCAL_PATH_VAR}
+    if [[ ! -d ${!LOCAL_PATH_VAR}/.git ]] ; then # something went wrong.
+      echo "FAILED. 'git clone' failed."
+      return 1
+    fi
+  fi
+  if [[ ! -e ${!LOCAL_PATH_VAR}/${TELLTALE} ]] ; then
+    echo "FAILED. Expected contents [${TELLTALE}] are missing."
+    return 4
+  fi
+  echo "Local ${COMP_NAME} contents OK"
+  return 0
+}
+
+# The main body of this file will just demo the function, or you can pass
+# '-e', '-x', '--export', or 'export' as the first parameter to export the
+# function to the current shell. If you do this, make sure to invoke the script
+# with 'source' or '.'.
+case $1 in
+  -e|-x|--export|export)
+    export ensure_repository_contents
+    ;;
+  *)
+    echo "Demontsrating 'ensure_repository_contents' function:"
+    LOCAL_REPO_PATH=~/dev/zerobandwidth/bash_hacks/
+    ensure_repository_contents "Bourne Ingenuity" LOCAL_REPO_PATH \
+      git://git@github.com/zerobandwidth-net/The_Bourne_Ingenuity \
+      "git_hacks"
+    ;;
+esac
+

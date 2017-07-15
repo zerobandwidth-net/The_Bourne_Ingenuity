@@ -1,0 +1,42 @@
+# Example .bashrc which shows ways to better organize some of the common shell
+# initialization stuff that's actually useful. This makes reference to several
+# subordinate files, which are also included in the samples. Feel free to use
+# this file basically as-is, with or without comments removed.
+
+shopt -s histappend                    # always append to bash_history
+shopt -s checkwinsize                  # adjust to changes in window size
+
+if [ -f ~/.bash_aliases ] ; then       # load aliases from a dedicated file
+  . ~/.bash_aliases                    # to keep clutter out of .bashrc
+fi
+
+if [ -f ~/.bash_functions ] ; then     # load custom shell functions from a
+  . ~/.bash_functions                  # dedicated file to keep clutter out of
+fi                                     # .bashrc
+
+if [ -f ~/.bash_paths ] ; then         # load path specifications from a
+  . ~/.bash_paths                      # dedicated file to keep clutter out of
+fi                                     # .bashrc
+
+# Fancy prompt spec. This renders a prompt that looks like the following:
+#
+# [ user@host:17//path/looks/like/uri/ ]
+# (11:26:57)>> _
+#
+# If you're also using any variant of the "gitloc" script, which discovers and
+# displays Git version control information for your current directory, then
+# the top version of the prompt will show that information on an additional
+# line.
+#
+# [ user@host:17//path/to/some/cool/dev/stuff/ ]
+# [ zerobandwidth-net/bash_hacks/master ]
+# (11:29:02)>> _
+if [[ "$(type -t gitloc)" == "function" || -n $(which gitloc) ]] ; then
+  # Insert a git location script into the prompt. See other samples for details.
+  export PS1="\n[ \u@\h:$(basename $(tty))/\w/ ]\$(gitloc)\n(\t)>> "
+else
+  export PS1="\n[ \u@\h:$(basename $(tty))/\w/ ]\n(\t)>> "
+fi
+export PS2="(\t)+> "
+
+

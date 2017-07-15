@@ -1,0 +1,14 @@
+#!/bin/bash
+# gitloc - GIT LOCation
+#
+# Uses the `wgr` and `wgb` scripts together, to render an indication of the
+# organization, repository, and branch under which the current directory is
+# controlled, if any. If the current directory is uncontrolled, it prints an
+# empty string. The output format is designed to be included as an extra
+# (conditional) line in the shell prompt; its exact look and feel may be
+# tweaked to taste.
+#
+# This function is also included in the sample `bash_functions`.
+if [[ $(git remote 2> /dev/null) ]] ; then
+ echo -e "\n[ $(wgr)/$(wgb) ]"
+fi

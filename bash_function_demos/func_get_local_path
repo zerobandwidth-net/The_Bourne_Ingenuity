@@ -1,0 +1,54 @@
+#!/bin/bash
+# This function will gather input from the user to define some local path,
+# creating the actual directory if necessary, and then store that path in the
+# specified shell variable.
+#
+# This is especially useful in conjunction with the 'ensure_repository_contents'
+# function included in the 'git_hacks' sample directory; together, you can get
+# a local path from the user, store it in a shell variable, and then verify that
+# the directory is a local view for the specified Git repository, cloning it if
+# needed.
+#
+# $1 -> $PATH_VAR - The variable into which the path should be written and
+#        exported to the rest of the script (or the shell).
+# $2 -> $COMP_NAME - The name of some component that would be stored at this
+#        path. If not applicable, just omit the argument, or pass an empty
+#        string.
+function get_local_path
+{
+  PATH_VAR=$1
+  COMP_NAME=$2
+  while [[ ! -d ${!PATH_VAR} ]] ; do   # Keep trying to get a valid path input.
+    if [[ -z ${!PATH_VAR} ]] ; then    # The value is still blank.
+      read -p "Enter ${COMP_NAME} path: " $PATH_VAR
+      export ${PATH_VAR}=${!PATH_VAR/#\~/$HOME}       # Handles tilde expansion.
+    else
+      echo "Path [${!PATH_VAR}] doesn't exist."
+      read -s -n 1 -p "Create it? [Y/n] "
+      echo ""
+      if [[ $REPLY =~ ^[Nn]$ ]] ; then
+        export ${PATH_VAR}=            # Discard value, next loop asks again.
+      else
+        mkdir -p ${!PATH_VAR}          # Try to create the full path.
+      fi
+    fi
+  done
+  export ${PATH_VAR}
+  echo "Path found: [${!PATH_VAR}]"
+}
+
+# The main body of this file will just demo the function, or you can pass
+# '-e', '-x', '--export', or 'export' as the first parameter to export the
+# function to the current shell. If you do this, make sure to invoke the script
+# with 'source' or '.'.
+case $1 in
+  -e|-x|--export|export)
+    export get_local_path
+    ;;
+  *)
+    echo "Demonstrating 'get_local_path' function:"
+    get_local_path GET_LOCAL_PATH_DEMO_VAL "demonstration"
+    echo "Variable value after function: ${GET_LOCAL_PATH_DEMO_VAL}"
+    ;;
+esac
+

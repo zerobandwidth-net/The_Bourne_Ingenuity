@@ -1,0 +1,82 @@
+#!/bin/bash
+# This function prints text that looks like a system status message. There are
+# two variants. The first will print the message left-justified on the left
+# side, then print the status left-justified at a 40-character tabstop. The
+# second variant prints the message left-justified on the left side, but the
+# status messages right-justified at the right side. Both variants use the same
+# set of parameters as documented below.
+#
+# $1 -> $MESSAGE - The message that gets printed on the left.
+# $2 -> $STATUS_VAL - The status or value that gets printed on the right.
+# $3 -> $STATUS_COLOR - (optional) the ANSI color spec to be applied to the
+#        status/value token. The script already renders the '\e[' and 'm' to
+#        enclose the style code; the caller needs only supply the code itself.
+# $4 -> $PAD_LENGTH - (optional) For left-justified version, this is the tabstop
+#        to which the status is left-justified. For the right-justified version,
+#        this is the size of the screen, to which the status is right-justified.
+#
+# Credit for these two clever hacks goes to a pair of answers on Stack Overflow:
+# * https://stackoverflow.com/a/4411098/
+# * https://stackoverflow.com/a/4410103/
+
+function print_padded_text
+{
+  MESSAGE=$1
+  STATUS_VAL=$2
+  STATUS_COLOR=$3
+  PAD_LENGTH=$4                        # needs to be a number!
+  if [[ -z "$4" ]] ; then PAD_LENGTH=40 ; fi
+  PAD_INSERT=$(printf '%*s' $(( ${PAD_LENGTH} - ${#MESSAGE} )) " ")
+  if [[ -z ${STATUS_COLOR} ]] ; then # don't bother inserting a colorizer
+    printf "%s%s[%s]\n" "${MESSAGE}" "${PAD_INSERT}" "${STATUS_VAL}"
+  else # also render ANSI colorizer code into the output string
+    printf "%s%s[\e[%sm%s\e[0m]\n" "${MESSAGE}" "${PAD_INSERT}" \
+      "${STATUS_COLOR}" "${STATUS_VAL}"
+  fi
+}
+
+function print_padded_text_long
+{
+  MESSAGE=$1
+  STATUS_VAL=$2
+  STATUS_COLOR=$3
+  PAD_LENGTH=$4                        # needs to be a number!
+  if [[ -z $4 ]] ; then PAD_LENGTH=80 ; fi
+  PAD_INSERT_LENGTH=$(( ${PAD_LENGTH} - ${#MESSAGE} - ${#STATUS_VAL} - 2 ))
+  PAD_INSERT=$(printf '%*s' "${PAD_INSERT_LENGTH}" " ")
+  if [[ -z ${STATUS_COLOR} ]] ; then # don't bother inserting a colorizer
+    printf "%s%s[%s]\n" "${MESSAGE}" "${PAD_INSERT}" "${STATUS_VAL}"
+  else # also render ANSI colorizer code into the output string
+    printf "%s%s[\e[%sm%s\e[0m]\n" "${MESSAGE}" "${PAD_INSERT}" \
+      "${STATUS_COLOR}" "${STATUS_VAL}"
+  fi
+}
+
+# The main body of this file will just demo the function, or you can pass
+# '-e', '-x', '--export', or 'export' as the first parameter to export the
+# function to the current shell. If you do this, make sure to invoke the script
+# with 'source' or '.'.
+case $1 in
+  -e|-x|--export|export)
+    export print_padded_text
+    export print_padded_text_long
+    ;;
+  *)
+    echo "Demonstrating 'print_padded_text' and 'print_padded_text_long':"
+
+    print_padded_text "short text" "whee"
+    print_padded_text "slightly longer text is..." "OK" "1;32"
+    print_padded_text "oh noes i've" "FAILED" "1;31"
+    print_padded_text "it's not easy being" "GREEN" "92"
+    print_padded_text "if you're feeling" "BLUE" "1;34"
+    print_padded_text "this tabstop is slightly" "longer" "95" 60
+    print_padded_text "and this one is" "too" "35" 60
+    
+    print_padded_text_long "The time is:" "NOW" "1"
+    print_padded_text_long "For a few coders who are:" "GOOD" "1;92"
+    print_padded_text_long "To bring:" "AID" "96"
+    print_padded_text_long "To their fellow geeks." "OK" "1;32"
+
+    ;;
+esac
+

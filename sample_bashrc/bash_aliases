@@ -1,0 +1,26 @@
+#!/bin/bash
+# Referenced by the sample .bashrc, this file defines a bunch of useful aliases
+# for common functions, often with "the usual" optional parameters specified.
+
+# ALIASES THAT AREN'T ALIASES
+# This establishes default editors. I like `vim`. Others like `nano`.
+export VISUAL=vim
+export EDITOR=${VISUAL}
+
+# COLORIZED SHELL SUPPORT
+if [ -x /usr/bin/dircolors ] ; then
+  # Enable use of color highlighting in programs that use it.
+  alias ls='ls --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color-auto'
+else
+  # There are some useful alternative options when color is not available.
+  alias ls='ls -p'                     # -p appends a classifier suffix
+fi
+  
+# USEFUL SHORTHANDS
+alias ll='ls -al'                      # long-list all contents
+alias vi='vim'                         # Ensures `vim` when only `vi` is typed
+alias vir='vi -M'                      # -M specifies a read-only open
+

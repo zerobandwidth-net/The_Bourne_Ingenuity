@@ -19,7 +19,7 @@ BRANCH_HASH=$(git rev-parse --quiet --verify ${BRANCH_NAME})
 if [[ -z ${BRANCH_HASH} ]] ; then # the branch doesn't exist locally; create it.
   git checkout -b ${BRANCH_NAME}
   git push origin ${BRANCH_NAME}
-  git branch -u origin ${BRANCH_NAME}
+  git branch -u origin/${BRANCH_NAME}
 else # the branch already exists locally; update it.
   git checkout ${BRANCH_NAME}
 fi

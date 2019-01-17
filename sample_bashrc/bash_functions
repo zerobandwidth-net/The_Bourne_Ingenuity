@@ -13,7 +13,7 @@
 # This function is also included as a discrete script in this repository.
 function wgb
 {
-  git symbolic-ref HEAD 2> /dev/null | cut -d '/' -f 3
+  git symbolic-ref HEAD 2> /dev/null | cut -d '/' -f 3-99
 }
 
 # wgr - Which Git Repository

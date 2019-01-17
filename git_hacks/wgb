@@ -6,4 +6,4 @@
 # This works for both local-only and remote-linked branches.
 #
 # This function is also included in the sample `bash_functions`.
-git symbolic-ref HEAD 2> /dev/null | cut -d '/' -f 3
+git symbolic-ref HEAD 2> /dev/null | cut -d '/' -f 3-99
